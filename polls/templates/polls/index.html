@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment System Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        .modal {
+            display: none;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .product-card.selected {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.2);
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <!-- Header -->
+    <header class="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="h-8 w-8 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <i data-lucide="credit-card" class="h-5 w-5 text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white">Payment System Pro</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="refreshData()" class="px-3 py-2 text-sm border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700 flex items-center space-x-2">
+                        <i data-lucide="refresh-cw" class="h-4 w-4"></i>
+                        <span>Refresh</span>
+                    </button>
+                    <button onclick="exportUsers()" class="px-3 py-2 text-sm border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700 flex items-center space-x-2">
+                        <i data-lucide="download" class="h-4 w-4"></i>
+                        <span>Export</span>
+                    </button>
+                    <button onclick="showToast('Settings dialog coming soon!')" class="px-3 py-2 text-sm border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700 flex items-center space-x-2">
+                        <i data-lucide="settings" class="h-4 w-4"></i>
+                        <span>Settings</span>
+                    </button>
+                    <a href="{% url 'logout' %}" class="px-3 py-2 text-sm border border-red-600 text-red-400 rounded-md hover:bg-red-600/20 flex items-center space-x-2">
+                        <i data-lucide="log-out" class="h-4 w-4"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-2">
+                <p class="text-sm text-slate-400">Last action: <span id="lastAction">System initialized</span></p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <!-- Tabs -->
+        <div class="space-y-6">
+            <div class="grid w-full grid-cols-5 bg-slate-800 border border-slate-700 rounded-lg p-1">
+                <button onclick="switchTab('users')" id="tab-users" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700 active">
+                    <i data-lucide="users" class="h-4 w-4"></i>
+                    <span>Users</span>
+                </button>
+                <button onclick="switchTab('products')" id="tab-products" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                    <i data-lucide="package" class="h-4 w-4"></i>
+                    <span>Products</span>
+                </button>
+                <button onclick="switchTab('payments')" id="tab-payments" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                    <i data-lucide="credit-card" class="h-4 w-4"></i>
+                    <span>Payments</span>
+                </button>
+                <button onclick="switchTab('coupons')" id="tab-coupons" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                    <i data-lucide="ticket" class="h-4 w-4"></i>
+                    <span>Coupons</span>
+                </button>
+                <button onclick="switchTab('gains')" id="tab-gains" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                    <i data-lucide="trending-up" class="h-4 w-4"></i>
+                    <span>Gains</span>
+                </button>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-content" class="tab-content active">
+                <div class="bg-slate-800 border border-slate-700 rounded-lg">
+                    <div class="p-6 border-b border-slate-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white">User Management</h3>
+                                <p class="text-slate-400 mt-1">Manage your customers and view their transaction history</p>
+                            </div>
+                            <button onclick="openModal('addUserModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+                                <i data-lucide="plus" class="h-4 w-4"></i>
+                                <span>Add User</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-3 h-4 w-4 text-slate-400"></i>
+                            <input type="text" id="userSearch" placeholder="Search users by name, email or phone..." 
+                                   class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                   oninput="filterUsers()">
+                        </div>
+                        <div class="rounded-lg border border-slate-700 overflow-hidden">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-slate-700 bg-slate-700/50">
+                                        <th class="text-left p-4 text-white font-medium">Name</th>
+                                        <th class="text-left p-4 text-white font-medium">Email</th>
+                                        <th class="text-left p-4 text-white font-medium">Phone</th>
+                                        <th class="text-left p-4 text-white font-medium">Total Spent</th>
+                                        <th class="text-left p-4 text-white font-medium">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTable">
+                                    <!-- Users will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="products-content" class="tab-content">
+                <div class="bg-slate-800 border border-slate-700 rounded-lg">
+                    <div class="p-6 border-b border-slate-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white">Product Management</h3>
+                                <p class="text-slate-400 mt-1">Manage your product catalog and pricing</p>
+                            </div>
+                            <button onclick="openModal('addProductModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+                                <i data-lucide="plus" class="h-4 w-4"></i>
+                                <span>Add Product</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-3 h-4 w-4 text-slate-400"></i>
+                            <input type="text" id="productSearch" placeholder="Search products..." 
+                                   class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                   oninput="filterProducts()">
+                        </div>
+                        <div class="rounded-lg border border-slate-700 overflow-hidden">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-slate-700 bg-slate-700/50">
+                                        <th class="text-left p-4 text-white font-medium">Product</th>
+                                        <th class="text-left p-4 text-white font-medium">Price</th>
+                                        <th class="text-left p-4 text-white font-medium">Description</th>
+                                        <th class="text-left p-4 text-white font-medium">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTable">
+                                    <!-- Products will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="payments-content" class="tab-content">
+                <div class="bg-slate-800 border border-slate-700 rounded-lg">
+                    <div class="p-6 border-b border-slate-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white">Payment Processing</h3>
+                                <p class="text-slate-400 mt-1">Process new payments and view recent transactions</p>
+                            </div>
+                            <button onclick="openModal('processPaymentModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+                                <i data-lucide="credit-card" class="h-4 w-4"></i>
+                                <span>Process Payment</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4">
+                            <div class="text-white font-medium">Recent Payments</div>
+                            <div id="recentPayments" class="space-y-3">
+                                <div class="text-center py-8 text-slate-400">
+                                    No payments processed yet. Click "Process Payment" to get started.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupons Tab -->
+            <div id="coupons-content" class="tab-content">
+                <div class="bg-slate-800 border border-slate-700 rounded-lg">
+                    <div class="p-6 border-b border-slate-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white">Coupon Management</h3>
+                                <p class="text-slate-400 mt-1">Manage your coupons and discounts</p>
+                            </div>
+                            <button onclick="openModal('addCouponModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+                                <i data-lucide="plus" class="h-4 w-4"></i>
+                                <span>Add Coupon</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="rounded-lg border border-slate-700 overflow-hidden">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-slate-700 bg-slate-700/50">
+                                        <th class="text-left p-4 text-white font-medium">Code</th>
+                                        <th class="text-left p-4 text-white font-medium">Discount</th>
+                                        <th class="text-left p-4 text-white font-medium">Active</th>
+                                        <th class="text-left p-4 text-white font-medium">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="couponsTable">
+                                    <!-- Coupons will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gains Tab -->
+            <div id="gains-content" class="tab-content">
+                <div class="bg-slate-800 border border-slate-700 rounded-lg">
+                    <div class="p-6 border-b border-slate-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xl font-semibold text-white">Gains Analysis</h3>
+                                <p class="text-slate-400 mt-1">View daily revenue and financial insights</p>
+                            </div>
+                            <button onclick="openModal('viewGainsModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+                                <i data-lucide="trending-up" class="h-4 w-4"></i>
+                                <span>View Daily Gains</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="p-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-lg">
+                                <div class="text-white/80 text-sm">Total Revenue</div>
+                                <div id="totalRevenue" class="text-2xl font-bold text-white">TND 0.00</div>
+                            </div>
+                            <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg">
+                                <div class="text-white/80 text-sm">Total Transactions</div>
+                                <div id="totalTransactions" class="text-2xl font-bold text-white">0</div>
+                            </div>
+                            <div class="p-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
+                                <div class="text-white/80 text-sm">Average Transaction</div>
+                                <div id="averageTransaction" class="text-2xl font-bold text-white">TND 0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Add New User</h3>
+                <p class="text-slate-400 mt-1">Enter the user's information below</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Full Name</label>
+                    <input type="text" id="newUserName" placeholder="e.g. John Doe" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="newUserEmail" placeholder="name@example.com" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Phone</label>
+                    <input type="text" id="newUserPhone" placeholder="e.g. 54555012" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('addUserModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
+                <button onclick="addUser()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Add User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Coupon Modal -->
+    <div id="addCouponModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Add New Coupon</h3>
+                <p class="text-slate-400 mt-1">Enter the coupon information below</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Coupon Code</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="newCouponCode" placeholder="e.g. SUMMER2024" 
+                               class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <button onclick="generateCouponCode()" class="px-3 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Generate</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Discount</label>
+                    <input type="number" step="0.01" id="newCouponDiscount" placeholder="e.g. 10.00" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('addCouponModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
+                <button onclick="addCoupon()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Add Coupon</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Add New Product</h3>
+                <p class="text-slate-400 mt-1">Enter the product information below</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Product Name</label>
+                    <input type="text" id="newProductName" placeholder="e.g. Coffee" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Price</label>
+                    <input type="number" step="0.01" id="newProductPrice" placeholder="e.g. 4.99" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Description</label>
+                    <textarea id="newProductDescription" placeholder="e.g. A delicious blend of coffee beans" 
+                              class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('addProductModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
+                <button onclick="addProduct()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Add Product</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Process Payment Modal -->
+    <div id="processPaymentModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-2xl mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Process New Payment</h3>
+                <p class="text-slate-400 mt-1">Select a user and products for the transaction</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Select User</label>
+                    <select id="paymentUser" class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="">Choose a user</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Select Products</label>
+                    <div id="productSelection" class="grid grid-cols-2 gap-2 mt-2 max-h-48 overflow-y-auto">
+                        <!-- Products will be populated here -->
+                    </div>
+                </div>
+                <div id="orderSummary" class="p-4 bg-slate-700 rounded-lg" style="display: none;">
+                    <div class="text-white font-medium mb-2">Order Summary</div>
+                    <div id="summaryItems"></div>
+                    <div class="border-t border-slate-600 mt-2 pt-2 flex justify-between text-white font-bold">
+                        <span>Total</span>
+                        <span id="summaryTotal" class="text-emerald-400">TND 0.00</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Coupon Code</label>
+                    <input type="text" id="couponCode" placeholder="Enter coupon code" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="usePoints" class="form-checkbox h-5 w-5 text-emerald-600 bg-slate-700 border-slate-600 rounded focus:ring-emerald-500">
+                        <span class="ml-2 text-white">Use Points</span>
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('processPaymentModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
+                <button onclick="processPayment()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Process Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Gains Modal -->
+    <div id="viewGainsModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Daily Gains Report</h3>
+                <p class="text-slate-400 mt-1">Enter a date to view gains for that day</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Date</label>
+                    <input type="date" id="selectedDate" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                           onchange="updateDailyGains()">
+                </div>
+                <div id="dailyGainsResult" class="p-4 bg-slate-700 rounded-lg" style="display: none;">
+                    <div class="text-white font-medium mb-2">Gains for <span id="gainsDate"></span></div>
+                    <div id="gainsAmount" class="text-2xl font-bold text-emerald-400">TND 0.00</div>
+                    <div id="gainsTransactions" class="text-slate-400 text-sm mt-1">0 transactions</div>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('viewGainsModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Transactions Modal -->
+    <div id="viewTransactionsModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-2xl mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Transaction History</h3>
+                <p id="transactionUserName" class="text-slate-400 mt-1"></p>
+            </div>
+            <div id="transactionHistory" class="space-y-4 max-h-96 overflow-y-auto">
+                <!-- Transaction history will be populated here -->
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('viewTransactionsModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Edit User</h3>
+                <p class="text-slate-400 mt-1">Update the user's information below</p>
+            </div>
+            <div class="space-y-4">
+                <input type="hidden" id="editUserId">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Full Name</label>
+                    <input type="text" id="editUserName" placeholder="e.g. John Doe" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="editUserEmail" placeholder="name@example.com" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Phone</label>
+                    <input type="text" id="editUserPhone" placeholder="e.g. 54555012" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('editUserModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
+                <button onclick="updateUser()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Update User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editProductModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
+            <div class="mb-4">
+                <h3 class="text-xl font-semibold text-white">Edit Product</h3>
+                <p class="text-slate-400 mt-1">Update the product information below</p>
+            </div>
+            <div class="space-y-4">
+                <input type="hidden" id="editProductId">
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Product Name</label>
+                    <input type="text" id="editProductName" placeholder="e.g. Coffee" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Price</label>
+                    <input type="number" step="0.01" id="editProductPrice" placeholder="e.g. 4.99" 
+                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-white text-sm font-medium mb-2">Description</label>
+                    <textarea id="editProductDescription" placeholder="e.g. A delicious blend of coffee beans" 
+                              class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeModal('editProductModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
+                <button onclick="updateProduct()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Update Product</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let users = [];
+        let products = [];
+        let payments = [];
+        let coupons = [];
+        let selectedProducts = {};
+
+        // Fetch initial data from the server
+        async function fetchData() {
+            try {
+                const usersResponse = await fetch('/api/users/');
+                if (!usersResponse.ok) throw new Error(`HTTP error! status: ${usersResponse.status}`);
+                users = await usersResponse.json();
+
+                const productsResponse = await fetch('/api/products/');
+                if (!productsResponse.ok) throw new Error(`HTTP error! status: ${productsResponse.status}`);
+                products = await productsResponse.json();
+
+                const paymentsResponse = await fetch('/api/payments/');
+                if (!paymentsResponse.ok) throw new Error(`HTTP error! status: ${paymentsResponse.status}`);
+                payments = await paymentsResponse.json();
+
+                const couponsResponse = await fetch('/api/coupons/');
+                if (!couponsResponse.ok) throw new Error(`HTTP error! status: ${couponsResponse.status}`);
+                coupons = await couponsResponse.json();
+
+                updateAction('Data loaded from server');
+                renderAll();
+            } catch (error) {
+                handleError('Error fetching data', error);
+            }
+        }
+
+        // Utility functions
+        function handleError(message, error) {
+            console.error(message + ':', error);
+            showToast(`${message}: ${error.message}`);
+        }
+
+        function updateAction(message) {
+            document.getElementById('lastAction').textContent = message;
+            showToast(message);
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            if (modalId === 'processPaymentModal') {
+                populatePaymentModal();
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            if (modalId === 'addUserModal') {
+                document.getElementById('newUserName').value = '';
+                document.getElementById('newUserEmail').value = '';
+                document.getElementById('newUserPhone').value = '';
+            } else if (modalId === 'addProductModal') {
+                document.getElementById('newProductName').value = '';
+                document.getElementById('newProductPrice').value = '';
+            } else if (modalId === 'addCouponModal') {
+                document.getElementById('newCouponCode').value = '';
+                document.getElementById('newCouponDiscount').value = '';
+            } else if (modalId === 'processPaymentModal') {
+                document.getElementById('paymentUser').value = '';
+                selectedProducts = {};
+                document.getElementById('orderSummary').style.display = 'none';
+            }
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active', 'bg-emerald-600');
+                btn.classList.add('text-slate-300');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Add active class to selected tab and content
+            const activeTab = document.getElementById(`tab-${tabName}`);
+            activeTab.classList.add('active', 'bg-emerald-600');
+            activeTab.classList.remove('text-slate-300');
+            document.getElementById(`${tabName}-content`).classList.add('active');
+
+            if (tabName === 'gains') {
+                updateGainsStats();
+            }
+        }
+
+        // User management
+        async function addUser() {
+            const name = document.getElementById('newUserName').value.trim();
+            const email = document.getElementById('newUserEmail').value.trim();
+            const phone = document.getElementById('newUserPhone').value.trim();
+
+            if (!name || !email || !phone) {
+                showToast('Please fill all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ name, email, phone })
+                });
+
+                if (response.ok) {
+                    const newUser = await response.json();
+                    users.push(newUser);
+                    closeModal('addUserModal');
+                    renderUsers();
+                    updateAction(`Added user: ${newUser.name} (${newUser.phone})`);
+                } else {
+                    showToast('Error adding user');
+                }
+            } catch (error) {
+                handleError('Error adding user', error);
+            }
+        }
+
+        async function removeUser(userId) {
+            const user = users.find(u => u.id == userId);
+            try {
+                const response = await fetch(`/api/users/${userId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                if (response.ok) {
+                    await fetchData();
+                    updateAction(`Removed user: ${user?.phone}`);
+                } else {
+                    showToast('Error removing user');
+                }
+            } catch (error) {
+                handleError('Error removing user', error);
+            }
+        }
+
+        function viewTransactions(userId) {
+            const user = users.find(u => u.id == userId);
+            if (!user) return;
+
+            document.getElementById('transactionUserName').textContent = `Viewing transactions for ${user.name}`;
+            
+            const historyDiv = document.getElementById('transactionHistory');
+            if (user.history.length === 0) {
+                historyDiv.innerHTML = '<div class="text-center py-8 text-slate-400">No transactions found for this user.</div>';
+            } else {
+                historyDiv.innerHTML = user.history.map((purchase, index) => `
+                    <div class="p-4 bg-slate-700 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-white font-medium">Transaction #${index + 1}</div>
+                            <div class="text-slate-400 text-sm">${purchase.date}</div>
+                        </div>
+                        <div class="space-y-1">
+                            ${purchase.products.map(product => `
+                                <div class="flex justify-between text-slate-300">
+                                    <span>${product.name}</span>
+                                    <span>TND ${parseFloat(product.price).toFixed(2)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="border-t border-slate-600 mt-2 pt-2 flex justify-between text-white font-bold">
+                            <span>Total</span>
+                            <span class="text-emerald-400">TND ${parseFloat(purchase.total).toFixed(2)}</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                const totalSpent = user.history.reduce((sum, purchase) => sum + parseFloat(purchase.total), 0);
+                historyDiv.innerHTML += `
+                    <div class="p-4 bg-emerald-600/20 border border-emerald-600/30 rounded-lg">
+                        <div class="text-white font-bold">Grand Total: TND ${totalSpent.toFixed(2)}</div>
+                    </div>
+                `;
+            }
+
+            openModal('viewTransactionsModal');
+        }
+
+        function renderUsers() {
+            const search = document.getElementById('userSearch').value.toLowerCase();
+            const filteredUsers = users.filter(user => 
+                user.name.toLowerCase().includes(search) ||
+                user.email.toLowerCase().includes(search) ||
+                user.phone.includes(search)
+            );
+
+            const tbody = document.getElementById('usersTable');
+            tbody.innerHTML = filteredUsers.map(user => {
+                const totalSpent = user.total_spent;
+                return `
+                    <tr class="border-b border-slate-700 hover:bg-slate-700/30">
+                        <td class="p-4 text-white font-medium">${user.name}</td>
+                        <td class="p-4 text-slate-300">${user.email}</td>
+                        <td class="p-4 text-slate-300">${user.phone}</td>
+                        <td class="p-4 text-emerald-400 font-medium">TND ${parseFloat(totalSpent).toFixed(2)}</td>
+                        <td class="p-4 text-white font-medium">${user.points}</td>
+                        <td class="p-4">
+                            <div class="flex space-x-2">
+                                <button onclick="viewTransactions('${user.id}')" class="p-2 border border-slate-600 text-slate-300 rounded hover:bg-slate-700">
+                                    <i data-lucide="eye" class="h-4 w-4"></i>
+                                </button>
+                                <button onclick="openEditUserModal('${user.id}')" class="p-2 border border-slate-600 text-slate-300 rounded hover:bg-slate-700">
+                                    <i data-lucide="edit" class="h-4 w-4"></i>
+                                </button>
+                                <button onclick="removeUser('${user.id}')" class="p-2 border border-red-600 text-red-400 rounded hover:bg-red-600/20">
+                                    <i data-lucide="trash-2" class="h-4 w-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function filterUsers() {
+            renderUsers();
+        }
+
+        function openEditUserModal(userId) {
+            const user = users.find(u => u.id == userId);
+            if (user) {
+                document.getElementById('editUserId').value = user.id;
+                document.getElementById('editUserName').value = user.name;
+                document.getElementById('editUserEmail').value = user.email;
+                document.getElementById('editUserPhone').value = user.phone;
+                openModal('editUserModal');
+            }
+        }
+
+        async function updateUser() {
+            const userId = document.getElementById('editUserId').value;
+            const name = document.getElementById('editUserName').value.trim();
+            const email = document.getElementById('editUserEmail').value.trim();
+            const phone = document.getElementById('editUserPhone').value.trim();
+
+            if (!name || !email || !phone) {
+                showToast('Please fill all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/${userId}/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ name, email, phone })
+                });
+
+                if (response.ok) {
+                    const updatedUser = await response.json();
+                    const index = users.findIndex(u => u.id == userId);
+                    if (index !== -1) {
+                        users[index] = updatedUser;
+                    }
+                    closeModal('editUserModal');
+                    renderUsers();
+                    updateAction(`Updated user: ${updatedUser.name}`);
+                } else {
+                    showToast('Error updating user');
+                }
+            } catch (error) {
+                handleError('Error updating user', error);
+            }
+        }
+
+        // Coupon management
+        function generateCouponCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('newCouponCode').value = result;
+        }
+
+        async function addCoupon() {
+            const code = document.getElementById('newCouponCode').value.trim();
+            const discountStr = document.getElementById('newCouponDiscount').value.trim();
+            const isPercentage = true;
+
+            if (!code || !discountStr) {
+                showToast('Please fill all fields');
+                return;
+            }
+
+            const discount = parseFloat(discountStr);
+
+            if (isNaN(discount) || discount <= 0) {
+                showToast('Please enter a valid discount');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/coupons/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ code, discount, is_percentage: isPercentage })
+                });
+
+                if (response.ok) {
+                    const newCoupon = await response.json();
+                    coupons.push(newCoupon);
+                    closeModal('addCouponModal');
+                    renderCoupons();
+                    updateAction(`Added coupon: ${newCoupon.code}`);
+                } else {
+                    const errorData = await response.json();
+                    showToast(`Error: ${errorData.detail || 'Failed to add coupon'}`);
+                }
+            } catch (error) {
+                handleError('Error adding coupon', error);
+            }
+        }
+
+        async function removeCoupon(couponId) {
+            const coupon = coupons.find(c => c.id == couponId);
+            try {
+                const response = await fetch(`/api/coupons/${couponId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                if (response.ok) {
+                    await fetchData();
+                    updateAction(`Removed coupon: ${coupon?.code}`);
+                } else {
+                    showToast('Error removing coupon');
+                }
+            } catch (error) {
+                handleError('Error removing coupon', error);
+            }
+        }
+
+        function renderCoupons() {
+            const tbody = document.getElementById('couponsTable');
+            tbody.innerHTML = coupons.map(coupon => `
+                <tr class="border-b border-slate-700 hover:bg-slate-700/30">
+                    <td class="p-4 text-white font-medium">${coupon.code}</td>
+                    <td class="p-4 text-emerald-400 font-medium">${coupon.discount}%</td>
+                    <td class="p-4 text-slate-300">${coupon.active ? 'Yes' : 'No'}</td>
+                    <td class="p-4">
+                        <button onclick="removeCoupon('${coupon.id}')" class="p-2 border border-red-600 text-red-400 rounded hover:bg-red-600/20">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // Product management
+        async function addProduct() {
+            const name = document.getElementById('newProductName').value.trim();
+            const priceStr = document.getElementById('newProductPrice').value.trim();
+            const description = document.getElementById('newProductDescription').value.trim();
+
+            if (!name || !priceStr) {
+                showToast('Please fill all fields');
+                return;
+            }
+
+            const price = parseFloat(priceStr);
+
+            if (isNaN(price) || price <= 0) {
+                showToast('Please enter a valid price');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/products/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ name, price, description })
+                });
+
+                if (response.ok) {
+                    const newProduct = await response.json();
+                    products.push(newProduct);
+                    closeModal('addProductModal');
+                    renderProducts();
+                    updateAction(`Added product: ${newProduct.name} (TND ${newProduct.price})`);
+                } else {
+                    showToast('Error adding product');
+                }
+            } catch (error) {
+                handleError('Error adding product', error);
+            }
+        }
+
+        async function removeProduct(productId) {
+            const product = products.find(p => p.id == productId);
+            try {
+                const response = await fetch(`/api/products/${productId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                if (response.ok) {
+                    await fetchData();
+                    updateAction(`Removed product: ${product?.name}`);
+                } else {
+                    showToast('Error removing product');
+                }
+            } catch (error) {
+                handleError('Error removing product', error);
+            }
+        }
+
+        function renderProducts() {
+            const search = document.getElementById('productSearch').value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(search)
+            );
+
+            const tbody = document.getElementById('productsTable');
+            tbody.innerHTML = filteredProducts.map(product => `
+                <tr class="border-b border-slate-700 hover:bg-slate-700/30">
+                    <td class="p-4 text-white font-medium">${product.name}</td>
+                    <td class="p-4 text-emerald-400 font-medium">TND ${parseFloat(product.price).toFixed(2)}</td>
+                    <td class="p-4 text-slate-300">${product.description}</td>
+                    <td class="p-4">
+                        <div class="flex space-x-2">
+                            <button onclick="openEditProductModal('${product.id}')" class="p-2 border border-slate-600 text-slate-300 rounded hover:bg-slate-700">
+                                <i data-lucide="edit" class="h-4 w-4"></i>
+                            </button>
+                            <button onclick="removeProduct('${product.id}')" class="p-2 border border-red-600 text-red-400 rounded hover:bg-red-600/20">
+                                <i data-lucide="trash-2" class="h-4 w-4"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function filterProducts() {
+            renderProducts();
+        }
+
+        function openEditProductModal(productId) {
+            const product = products.find(p => p.id == productId);
+            if (product) {
+                document.getElementById('editProductId').value = product.id;
+                document.getElementById('editProductName').value = product.name;
+                document.getElementById('editProductPrice').value = product.price;
+                document.getElementById('editProductDescription').value = product.description;
+                openModal('editProductModal');
+            }
+        }
+
+        async function updateProduct() {
+            const productId = document.getElementById('editProductId').value;
+            const name = document.getElementById('editProductName').value.trim();
+            const priceStr = document.getElementById('editProductPrice').value.trim();
+            const description = document.getElementById('editProductDescription').value.trim();
+
+            if (!name || !priceStr) {
+                showToast('Please fill name and price');
+                return;
+            }
+
+            const price = parseFloat(priceStr);
+            if (isNaN(price) || price <= 0) {
+                showToast('Please enter a valid price');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/products/${productId}/`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ name, price, description })
+                });
+
+                if (response.ok) {
+                    const updatedProduct = await response.json();
+                    const index = products.findIndex(p => p.id == productId);
+                    if (index !== -1) {
+                        products[index] = updatedProduct;
+                    }
+                    closeModal('editProductModal');
+                    renderProducts();
+                    updateAction(`Updated product: ${updatedProduct.name}`);
+                } else {
+                    showToast('Error updating product');
+                }
+            } catch (error) {
+                handleError('Error updating product', error);
+            }
+        }
+
+        // Payment processing
+        function populatePaymentModal() {
+            const userSelect = document.getElementById('paymentUser');
+            userSelect.innerHTML = '<option value="">Choose a user</option>' +
+                users.map(user => `<option value="${user.id}">${user.name} (${user.phone})  PT(${user.points})</option>`).join('');
+
+            const productDiv = document.getElementById('productSelection');
+            productDiv.innerHTML = products.map(product => `
+                <div id="product-card-${product.id}" class="product-card p-3 rounded-lg border border-slate-600 bg-slate-700 transition-colors">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-white font-medium">${product.name}</div>
+                            <div class="text-emerald-400">TND ${parseFloat(product.price).toFixed(2)}</div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeQuantity('${product.id}', -1)" class="p-1 rounded-md bg-slate-600 hover:bg-slate-500">-</button>
+                            <input type="number" id="quantity-${product.id}" value="0" min="0" class="w-12 text-center bg-slate-800 border border-slate-600 rounded-md" oninput="updateQuantityFromInput('${product.id}')">
+                            <button onclick="changeQuantity('${product.id}', 1)" class="p-1 rounded-md bg-slate-600 hover:bg-slate-500">+</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            selectedProducts = {};
+            updateOrderSummary();
+        }
+
+        function changeQuantity(productId, delta) {
+            const quantityInput = document.getElementById(`quantity-${productId}`);
+            let currentQuantity = parseInt(quantityInput.value);
+            let newQuantity = currentQuantity + delta;
+            if (newQuantity < 0) {
+                newQuantity = 0;
+            }
+            quantityInput.value = newQuantity;
+            updateQuantityFromInput(productId);
+        }
+
+        function updateQuantityFromInput(productId) {
+            const quantityInput = document.getElementById(`quantity-${productId}`);
+            const quantity = parseInt(quantityInput.value);
+            const card = document.getElementById(`product-card-${productId}`);
+
+            if (quantity > 0) {
+                selectedProducts[productId] = quantity;
+                card.classList.add('selected');
+            } else {
+                delete selectedProducts[productId];
+                card.classList.remove('selected');
+            }
+            updateOrderSummary();
+        }
+
+        function updateOrderSummary() {
+            const summaryDiv = document.getElementById('orderSummary');
+            const itemsDiv = document.getElementById('summaryItems');
+            const totalSpan = document.getElementById('summaryTotal');
+            const productIds = Object.keys(selectedProducts);
+
+            if (productIds.length === 0) {
+                summaryDiv.style.display = 'none';
+                return;
+            }
+
+            let total = 0;
+            const userId = document.getElementById('paymentUser').value;
+            const user = users.find(u => u.id == userId);
+            let remainingPoints = user ? user.points : 0;
+
+            itemsDiv.innerHTML = productIds.map(productId => {
+                const product = products.find(p => p.id == productId);
+                const quantity = selectedProducts[productId];
+                const subtotal = parseFloat(product.price) * quantity;
+                let discount = 0;
+                if (user && remainingPoints > 0 && document.getElementById('usePoints').checked) {
+                    discount = Math.min(remainingPoints, subtotal);
+                    remainingPoints -= discount;
+                    total += subtotal - discount*0.1;
+                } 
+                else {
+                    total += subtotal;
+                }
+                return `
+                    <div class="flex justify-between text-slate-300">
+                        <span>${product.name} x ${quantity}</span>
+                        <span>TND ${subtotal.toFixed(2)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            totalSpan.textContent = `TND ${total.toFixed(2)}`;
+            summaryDiv.style.display = 'block';
+        }
+
+        async function processPayment() {
+            const userId = document.getElementById('paymentUser').value;
+            const productIds = Object.keys(selectedProducts);
+
+            if (!userId || productIds.length === 0) {
+                showToast('Please select a user and at least one product');
+                return;
+            }
+
+            const user = users.find(u => u.id == userId);
+            let total = 0;
+            let remainingPoints = user ? user.points : 0;
+
+            const purchasedProducts = productIds.map(productId => {
+                const product = products.find(p => p.id == productId);
+                const quantity = selectedProducts[productId];
+                const subtotal = parseFloat(product.price) * quantity;
+
+                if (remainingPoints > 0 && document.getElementById('usePoints').checked) {
+                    const discount = Math.min(remainingPoints, subtotal);
+                    total += subtotal - discount;
+                    remainingPoints -= discount;
+                } else {
+                    total += subtotal;
+                }
+
+                return {
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: quantity
+                };
+            });
+
+            const coupon = document.getElementById('couponCode').value.trim();
+            const use_points = document.getElementById('usePoints').checked;
+
+            const paymentData = {
+                userId,
+                products: purchasedProducts,
+                total,
+                coupon,
+                use_points
+            };
+
+            try {
+                const response = await fetch('/api/payments/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify(paymentData)
+                });
+
+                if (response.ok) {
+                    await fetchData();
+                    closeModal('processPaymentModal');
+                    updateAction(`Payment TND ${parseFloat(total).toFixed(2)} processed for ${user.name}`);
+                } else {
+                    showToast('Error processing payment');
+                }
+            } catch (error) {
+                handleError('Error processing payment', error);
+            }
+        }
+
+        function renderPayments() {
+            const paymentsDiv = document.getElementById('recentPayments');
+            
+            if (payments.length === 0) {
+                paymentsDiv.innerHTML = '<div class="text-center py-8 text-slate-400">No payments processed yet. Click "Process Payment" to get started.</div>';
+                return;
+            }
+
+            const recentPayments = payments.slice(-5).reverse();
+            paymentsDiv.innerHTML = recentPayments.map(payment => `
+                <div class="p-4 bg-slate-700 rounded-lg">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="text-white font-medium">${payment.userName}</div>
+                            <div class="text-slate-400 text-sm">${payment.date}</div>
+                            <div class="text-slate-300 text-sm mt-1">
+                                ${payment.products.map(p => p.name).join(', ')}
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="bg-emerald-600 text-white px-2 py-1 rounded text-sm font-medium">
+                                TND ${parseFloat(payment.total).toFixed(2)}
+                            </div>
+                            <button onclick="removePayment('${payment.id}')" class="p-2 border border-red-600 text-red-400 rounded hover:bg-red-600/20">
+                                <i data-lucide="trash-2" class="h-4 w-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        async function removePayment(paymentId) {
+            try {
+                const response = await fetch(`/api/payments/${paymentId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                if (response.ok) {
+                    await fetchData();
+                    updateAction(`Removed payment ${paymentId}`);
+                } else {
+                    showToast('Error removing payment');
+                }
+            } catch (error) {
+                handleError('Error removing payment', error);
+            }
+        }
+
+        // Gains analysis
+        function updateGainsStats() {
+            const totalRevenue = payments.reduce((sum, p) => sum + parseFloat(p.total), 0);
+            const totalTransactions = payments.length;
+            const averageTransaction = totalTransactions > 0 ? totalRevenue / totalTransactions : 0;
+
+            document.getElementById('totalRevenue').textContent = `TND ${totalRevenue.toFixed(2)}`;
+            document.getElementById('totalTransactions').textContent = totalTransactions;
+            document.getElementById('averageTransaction').textContent = `TND ${averageTransaction.toFixed(2)}`;
+        }
+
+        function updateDailyGains() {
+            const selectedDate = document.getElementById('selectedDate').value;
+            if (!selectedDate) return;
+
+            const dailyPayments = payments.filter(p => p.date === selectedDate);
+            const dailyTotal = dailyPayments.reduce((sum, p) => sum + parseFloat(p.total), 0);
+
+            document.getElementById('gainsDate').textContent = selectedDate;
+            document.getElementById('gainsAmount').textContent = `TND ${dailyTotal.toFixed(2)}`;
+            document.getElementById('gainsTransactions').textContent = `${dailyPayments.length} transactions`;
+            document.getElementById('dailyGainsResult').style.display = 'block';
+        }
+
+        // Export functionality
+        function exportUsers() {
+            const csvContent = ['Name,Email,Phone', ...users.map(u => `${u.name},${u.email},${u.phone}`)].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'users.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            updateAction('Exported users to CSV');
+        }
+
+        function refreshData() {
+            renderAll();
+            updateAction('Refreshed data');
+        }
+
+        function renderAll() {
+            renderUsers();
+            renderProducts();
+            renderPayments();
+            renderCoupons();
+            updateGainsStats();
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchData();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
