@@ -7,18 +7,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
-        .modal {
-            display: none;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
+        .modal { display: none; }
+        .modal.active { display: flex; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
         .product-card.selected {
             border-color: #10b981;
             background-color: rgba(16, 185, 129, 0.2);
@@ -36,23 +28,21 @@
             transform: translateX(400px);
             transition: transform 0.3s ease;
         }
-        .toast.show {
-            transform: translateX(0);
-        }
+        .toast.show { transform: translateX(0); }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
     <!-- Header -->
     <header class="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm">
-        <div class="container mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
+        <div class="container mx-auto px-2 sm:px-4 md:px-6 py-4">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center space-x-3">
                     <div class="h-8 w-8 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
                         <i data-lucide="credit-card" class="h-5 w-5 text-white"></i>
                     </div>
                     <h1 class="text-2xl font-bold text-white">Payment System Pro</h1>
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex flex-wrap items-center gap-2">
                     <button onclick="refreshData()" class="px-3 py-2 text-sm border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700 flex items-center space-x-2">
                         <i data-lucide="refresh-cw" class="h-4 w-4"></i>
                         <span>Refresh</span>
@@ -78,27 +68,27 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-6 py-8">
+    <main class="container mx-auto px-2 sm:px-4 md:px-6 py-8">
         <!-- Tabs -->
         <div class="space-y-6">
-            <div class="grid w-full grid-cols-5 bg-slate-800 border border-slate-700 rounded-lg p-1">
-                <button onclick="switchTab('users')" id="tab-users" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700 active">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 bg-slate-800 border border-slate-700 rounded-lg p-1">
+                <button onclick="switchTab('users')" id="tab-users" class="tab-button flex items-center justify-center space-x-2 px-2 sm:px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700 active">
                     <i data-lucide="users" class="h-4 w-4"></i>
                     <span>Users</span>
                 </button>
-                <button onclick="switchTab('products')" id="tab-products" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                <button onclick="switchTab('products')" id="tab-products" class="tab-button flex items-center justify-center space-x-2 px-2 sm:px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
                     <i data-lucide="package" class="h-4 w-4"></i>
                     <span>Products</span>
                 </button>
-                <button onclick="switchTab('payments')" id="tab-payments" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                <button onclick="switchTab('payments')" id="tab-payments" class="tab-button flex items-center justify-center space-x-2 px-2 sm:px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
                     <i data-lucide="credit-card" class="h-4 w-4"></i>
                     <span>Payments</span>
                 </button>
-                <button onclick="switchTab('coupons')" id="tab-coupons" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                <button onclick="switchTab('coupons')" id="tab-coupons" class="tab-button flex items-center justify-center space-x-2 px-2 sm:px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
                     <i data-lucide="ticket" class="h-4 w-4"></i>
                     <span>Coupons</span>
                 </button>
-                <button onclick="switchTab('gains')" id="tab-gains" class="tab-button flex items-center justify-center space-x-2 px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
+                <button onclick="switchTab('gains')" id="tab-gains" class="tab-button flex items-center justify-center space-x-2 px-2 sm:px-4 py-2 rounded-md text-slate-300 hover:bg-slate-700">
                     <i data-lucide="trending-up" class="h-4 w-4"></i>
                     <span>Gains</span>
                 </button>
@@ -107,11 +97,10 @@
             <!-- Users Tab -->
             <div id="users-content" class="tab-content active">
                 <div class="bg-slate-800 border border-slate-700 rounded-lg">
-                    <div class="p-6 border-b border-slate-700">
-                        <div class="flex items-center justify-between">
+                    <div class="p-4 sm:p-6 border-b border-slate-700">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
                             <div>
-                                <h3 class="text-xl font-semibold text-white">User Management</h3>
-                                <p class="text-slate-400 mt-1">Manage your customers and view their transaction history</p>
+                                <span class="text-lg text-white font-semibold">Users</span>
                             </div>
                             <button onclick="openModal('addUserModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
                                 <i data-lucide="plus" class="h-4 w-4"></i>
@@ -119,27 +108,24 @@
                             </button>
                         </div>
                     </div>
-                    <div class="p-6 space-y-4">
+                    <div class="p-4 sm:p-6 space-y-4">
                         <div class="relative">
                             <i data-lucide="search" class="absolute left-3 top-3 h-4 w-4 text-slate-400"></i>
-                            <input type="text" id="userSearch" placeholder="Search users by name, email or phone..." 
-                                   class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                   oninput="filterUsers()">
+                            <input type="text" id="userSearch" placeholder="Search users by name, email or phone..." class="w-full pl-10 pr-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         </div>
-                        <div class="rounded-lg border border-slate-700 overflow-hidden">
-                            <table class="w-full">
+                        <div class="rounded-lg border border-slate-700 overflow-x-auto">
+                            <table class="w-full min-w-[600px]">
                                 <thead>
-                                    <tr class="border-b border-slate-700 bg-slate-700/50">
-                                        <th class="text-left p-4 text-white font-medium">Name</th>
-                                        <th class="text-left p-4 text-white font-medium">Email</th>
-                                        <th class="text-left p-4 text-white font-medium">Phone</th>
-                                        <th class="text-left p-4 text-white font-medium">Total Spent</th>
-                                        <th class="text-left p-4 text-white font-medium">Actions</th>
+                                    <tr>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Name</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Email</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Phone</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Total Spent</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Points</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="usersTable">
-                                    <!-- Users will be populated here -->
-                                </tbody>
+                                <tbody id="usersTable"></tbody>
                             </table>
                         </div>
                     </div>
@@ -149,11 +135,10 @@
             <!-- Products Tab -->
             <div id="products-content" class="tab-content">
                 <div class="bg-slate-800 border border-slate-700 rounded-lg">
-                    <div class="p-6 border-b border-slate-700">
-                        <div class="flex items-center justify-between">
+                    <div class="p-4 sm:p-6 border-b border-slate-700">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
                             <div>
-                                <h3 class="text-xl font-semibold text-white">Product Management</h3>
-                                <p class="text-slate-400 mt-1">Manage your product catalog and pricing</p>
+                                <span class="text-lg text-white font-semibold">Products</span>
                             </div>
                             <button onclick="openModal('addProductModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
                                 <i data-lucide="plus" class="h-4 w-4"></i>
@@ -161,26 +146,54 @@
                             </button>
                         </div>
                     </div>
-                    <div class="p-6 space-y-4">
+                    <div class="p-4 sm:p-6 space-y-4">
                         <div class="relative">
                             <i data-lucide="search" class="absolute left-3 top-3 h-4 w-4 text-slate-400"></i>
-                            <input type="text" id="productSearch" placeholder="Search products..." 
-                                   class="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                   oninput="filterProducts()">
+                            <input type="text" id="productSearch" placeholder="Search products..." class="w-full pl-10 pr-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         </div>
-                        <div class="rounded-lg border border-slate-700 overflow-hidden">
-                            <table class="w-full">
+                        <div class="rounded-lg border border-slate-700 overflow-x-auto">
+                            <table class="w-full min-w-[600px]">
                                 <thead>
-                                    <tr class="border-b border-slate-700 bg-slate-700/50">
-                                        <th class="text-left p-4 text-white font-medium">Product</th>
-                                        <th class="text-left p-4 text-white font-medium">Price</th>
-                                        <th class="text-left p-4 text-white font-medium">Description</th>
-                                        <th class="text-left p-4 text-white font-medium">Actions</th>
+                                    <tr>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Name</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Price</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Description</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="productsTable">
-                                    <!-- Products will be populated here -->
-                                </tbody>
+                                <tbody id="productsTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupons Tab -->
+            <div id="coupons-content" class="tab-content">
+                <div class="bg-slate-800 border border-slate-700 rounded-lg">
+                    <div class="p-4 sm:p-6 border-b border-slate-700">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+                            <div>
+                                <span class="text-lg text-white font-semibold">Coupons</span>
+                            </div>
+                            <button onclick="openModal('addCouponModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
+                                <i data-lucide="plus" class="h-4 w-4"></i>
+                                <span>Add Coupon</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4 sm:p-6 space-y-4">
+                        <div class="rounded-lg border border-slate-700 overflow-x-auto">
+                            <table class="w-full min-w-[600px]">
+                                <thead>
+                                    <tr>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Code</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Discount</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Active</th>
+                                        <th class="p-2 sm:p-4 text-left text-slate-400">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="couponsTable"></tbody>
                             </table>
                         </div>
                     </div>
@@ -190,61 +203,21 @@
             <!-- Payments Tab -->
             <div id="payments-content" class="tab-content">
                 <div class="bg-slate-800 border border-slate-700 rounded-lg">
-                    <div class="p-6 border-b border-slate-700">
-                        <div class="flex items-center justify-between">
+                    <div class="p-4 sm:p-6 border-b border-slate-700">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
                             <div>
-                                <h3 class="text-xl font-semibold text-white">Payment Processing</h3>
-                                <p class="text-slate-400 mt-1">Process new payments and view recent transactions</p>
+                                <span class="text-lg text-white font-semibold">Payments</span>
                             </div>
                             <button onclick="openModal('processPaymentModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-                                <i data-lucide="credit-card" class="h-4 w-4"></i>
+                                <i data-lucide="plus" class="h-4 w-4"></i>
                                 <span>Process Payment</span>
                             </button>
                         </div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-4 sm:p-6">
                         <div class="space-y-4">
                             <div class="text-white font-medium">Recent Payments</div>
-                            <div id="recentPayments" class="space-y-3">
-                                <div class="text-center py-8 text-slate-400">
-                                    No payments processed yet. Click "Process Payment" to get started.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Coupons Tab -->
-            <div id="coupons-content" class="tab-content">
-                <div class="bg-slate-800 border border-slate-700 rounded-lg">
-                    <div class="p-6 border-b border-slate-700">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-xl font-semibold text-white">Coupon Management</h3>
-                                <p class="text-slate-400 mt-1">Manage your coupons and discounts</p>
-                            </div>
-                            <button onclick="openModal('addCouponModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-                                <i data-lucide="plus" class="h-4 w-4"></i>
-                                <span>Add Coupon</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div class="rounded-lg border border-slate-700 overflow-hidden">
-                            <table class="w-full">
-                                <thead>
-                                    <tr class="border-b border-slate-700 bg-slate-700/50">
-                                        <th class="text-left p-4 text-white font-medium">Code</th>
-                                        <th class="text-left p-4 text-white font-medium">Discount</th>
-                                        <th class="text-left p-4 text-white font-medium">Active</th>
-                                        <th class="text-left p-4 text-white font-medium">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="couponsTable">
-                                    <!-- Coupons will be populated here -->
-                                </tbody>
-                            </table>
+                            <div id="recentPayments" class="space-y-3"></div>
                         </div>
                     </div>
                 </div>
@@ -253,31 +226,30 @@
             <!-- Gains Tab -->
             <div id="gains-content" class="tab-content">
                 <div class="bg-slate-800 border border-slate-700 rounded-lg">
-                    <div class="p-6 border-b border-slate-700">
-                        <div class="flex items-center justify-between">
+                    <div class="p-4 sm:p-6 border-b border-slate-700">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
                             <div>
-                                <h3 class="text-xl font-semibold text-white">Gains Analysis</h3>
-                                <p class="text-slate-400 mt-1">View daily revenue and financial insights</p>
+                                <span class="text-lg text-white font-semibold">Gains</span>
                             </div>
                             <button onclick="openModal('viewGainsModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center space-x-2">
-                                <i data-lucide="trending-up" class="h-4 w-4"></i>
-                                <span>View Daily Gains</span>
+                                <i data-lucide="bar-chart-2" class="h-4 w-4"></i>
+                                <span>View Gains</span>
                             </button>
                         </div>
                     </div>
-                    <div class="p-6">
+                    <div class="p-4 sm:p-6">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="p-6 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-lg">
-                                <div class="text-white/80 text-sm">Total Revenue</div>
-                                <div id="totalRevenue" class="text-2xl font-bold text-white">TND 0.00</div>
+                                <div class="text-white text-lg font-bold" id="totalRevenue">TND 0.00</div>
+                                <div class="text-slate-200">Total Revenue</div>
                             </div>
                             <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg">
-                                <div class="text-white/80 text-sm">Total Transactions</div>
-                                <div id="totalTransactions" class="text-2xl font-bold text-white">0</div>
+                                <div class="text-white text-lg font-bold" id="totalTransactions">0</div>
+                                <div class="text-slate-200">Total Transactions</div>
                             </div>
-                            <div class="p-6 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
-                                <div class="text-white/80 text-sm">Average Transaction</div>
-                                <div id="averageTransaction" class="text-2xl font-bold text-white">TND 0.00</div>
+                            <div class="p-6 bg-gradient-to-r from-pink-600 to-rose-600 rounded-lg">
+                                <div class="text-white text-lg font-bold" id="averageTransaction">TND 0.00</div>
+                                <div class="text-slate-200">Average Transaction</div>
                             </div>
                         </div>
                     </div>
@@ -285,251 +257,6 @@
             </div>
         </div>
     </main>
-
-    <!-- Modals -->
-    <!-- Add User Modal -->
-    <div id="addUserModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Add New User</h3>
-                <p class="text-slate-400 mt-1">Enter the user's information below</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Full Name</label>
-                    <input type="text" id="newUserName" placeholder="e.g. John Doe" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Email</label>
-                    <input type="email" id="newUserEmail" placeholder="name@example.com" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Phone</label>
-                    <input type="text" id="newUserPhone" placeholder="e.g. 54555012" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('addUserModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
-                <button onclick="addUser()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Add User</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Coupon Modal -->
-    <div id="addCouponModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Add New Coupon</h3>
-                <p class="text-slate-400 mt-1">Enter the coupon information below</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Coupon Code</label>
-                    <div class="flex space-x-2">
-                        <input type="text" id="newCouponCode" placeholder="e.g. SUMMER2024" 
-                               class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <button onclick="generateCouponCode()" class="px-3 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Generate</button>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Discount</label>
-                    <input type="number" step="0.01" id="newCouponDiscount" placeholder="e.g. 10.00" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('addCouponModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
-                <button onclick="addCoupon()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Add Coupon</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Product Modal -->
-    <div id="addProductModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Add New Product</h3>
-                <p class="text-slate-400 mt-1">Enter the product information below</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Product Name</label>
-                    <input type="text" id="newProductName" placeholder="e.g. Coffee" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Price</label>
-                    <input type="number" step="0.01" id="newProductPrice" placeholder="e.g. 4.99" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Description</label>
-                    <textarea id="newProductDescription" placeholder="e.g. A delicious blend of coffee beans" 
-                              class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('addProductModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
-                <button onclick="addProduct()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Add Product</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Process Payment Modal -->
-    <div id="processPaymentModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-2xl mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Process New Payment</h3>
-                <p class="text-slate-400 mt-1">Select a user and products for the transaction</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Select User</label>
-                    <select id="paymentUser" class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                        <option value="">Choose a user</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Select Products</label>
-                    <div id="productSelection" class="grid grid-cols-2 gap-2 mt-2 max-h-48 overflow-y-auto">
-                        <!-- Products will be populated here -->
-                    </div>
-                </div>
-                <div id="orderSummary" class="p-4 bg-slate-700 rounded-lg" style="display: none;">
-                    <div class="text-white font-medium mb-2">Order Summary</div>
-                    <div id="summaryItems"></div>
-                    <div class="border-t border-slate-600 mt-2 pt-2 flex justify-between text-white font-bold">
-                        <span>Total</span>
-                        <span id="summaryTotal" class="text-emerald-400">TND 0.00</span>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Coupon Code</label>
-                    <input type="text" id="couponCode" placeholder="Enter coupon code" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="flex items-center">
-                        <input type="checkbox" id="usePoints" class="form-checkbox h-5 w-5 text-emerald-600 bg-slate-700 border-slate-600 rounded focus:ring-emerald-500">
-                        <span class="ml-2 text-white">Use Points</span>
-                    </label>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('processPaymentModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
-                <button onclick="processPayment()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Process Payment</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Gains Modal -->
-    <div id="viewGainsModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Daily Gains Report</h3>
-                <p class="text-slate-400 mt-1">Enter a date to view gains for that day</p>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Date</label>
-                    <input type="date" id="selectedDate" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                           onchange="updateDailyGains()">
-                </div>
-                <div id="dailyGainsResult" class="p-4 bg-slate-700 rounded-lg" style="display: none;">
-                    <div class="text-white font-medium mb-2">Gains for <span id="gainsDate"></span></div>
-                    <div id="gainsAmount" class="text-2xl font-bold text-emerald-400">TND 0.00</div>
-                    <div id="gainsTransactions" class="text-slate-400 text-sm mt-1">0 transactions</div>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('viewGainsModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Transactions Modal -->
-    <div id="viewTransactionsModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-2xl mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Transaction History</h3>
-                <p id="transactionUserName" class="text-slate-400 mt-1"></p>
-            </div>
-            <div id="transactionHistory" class="space-y-4 max-h-96 overflow-y-auto">
-                <!-- Transaction history will be populated here -->
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('viewTransactionsModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit User Modal -->
-    <div id="editUserModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Edit User</h3>
-                <p class="text-slate-400 mt-1">Update the user's information below</p>
-            </div>
-            <div class="space-y-4">
-                <input type="hidden" id="editUserId">
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Full Name</label>
-                    <input type="text" id="editUserName" placeholder="e.g. John Doe" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Email</label>
-                    <input type="email" id="editUserEmail" placeholder="name@example.com" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Phone</label>
-                    <input type="text" id="editUserPhone" placeholder="e.g. 54555012" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('editUserModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
-                <button onclick="updateUser()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Update User</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Product Modal -->
-    <div id="editProductModal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50">
-        <div class="bg-slate-800 border border-slate-700 rounded-lg p-6 w-full max-w-md mx-4">
-            <div class="mb-4">
-                <h3 class="text-xl font-semibold text-white">Edit Product</h3>
-                <p class="text-slate-400 mt-1">Update the product information below</p>
-            </div>
-            <div class="space-y-4">
-                <input type="hidden" id="editProductId">
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Product Name</label>
-                    <input type="text" id="editProductName" placeholder="e.g. Coffee" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Price</label>
-                    <input type="number" step="0.01" id="editProductPrice" placeholder="e.g. 4.99" 
-                           class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-white text-sm font-medium mb-2">Description</label>
-                    <textarea id="editProductDescription" placeholder="e.g. A delicious blend of coffee beans" 
-                              class="w-full px-3 py-2 bg-slate-700 border border-slate-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button onclick="closeModal('editProductModal')" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-md hover:bg-slate-700">Cancel</button>
-                <button onclick="updateProduct()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Update Product</button>
-            </div>
-        </div>
-    </div>
 
     <script>
         // Data storage
